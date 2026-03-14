@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import lightning as L
+import torch
 
 from generative_models.data.datamodule import ImageDataModule
 from generative_models.models.base import GenerativeModel
@@ -14,6 +15,7 @@ def train(
     datamodule: ImageDataModule | None = None,
     max_epochs: int = 20,
     accelerator: str = "auto",
+    precision: str = "bf16-mixed",
     log_dir: str = "runs",
     sample_every_n_epochs: int = 5,
     n_samples: int = 16,
@@ -30,6 +32,11 @@ def train(
         Training duration.
     accelerator:
         ``"auto"``, ``"gpu"``, ``"cpu"``, etc.
+    precision:
+        Training precision. ``"bf16-mixed"`` and ``"16-mixed"`` enable AMP
+        so that matmuls and convolutions run on tensor cores.  Use ``"32"``
+        to fall back to full-precision (TF32 tensor cores are still used
+        for float32 matmuls).
     log_dir:
         Root directory for TensorBoard logs.  Each model class gets its
         own sub-directory so metrics are easy to compare.
@@ -38,6 +45,10 @@ def train(
     n_samples:
         Number of images in the sample grid.
     """
+    # Allow tensor cores for float32 matmuls (TF32) — negligible accuracy
+    # impact but large speedup on Ampere+ GPUs.
+    torch.set_float32_matmul_precision("high")
+
     if datamodule is None:
         datamodule = ImageDataModule()
 
@@ -63,9 +74,10 @@ def train(
     trainer = L.Trainer(
         max_epochs=max_epochs,
         accelerator=accelerator,
+        precision=precision,
         logger=logger,
         callbacks=callbacks,
-        deterministic=True,
+        deterministic="warn",
     )
 
     trainer.fit(model, datamodule=datamodule)

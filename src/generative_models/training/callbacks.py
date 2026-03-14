@@ -26,7 +26,7 @@ class SampleGridCallback(L.Callback):
             return
 
         with torch.no_grad():
-            samples = pl_module.sample(self.n_samples)
+            samples = pl_module.sample(self.n_samples).float()
         grid = make_grid(samples, nrow=4, normalize=True, value_range=(0, 1))
 
         for logger in trainer.loggers:
@@ -56,10 +56,10 @@ class SampleGridCallback(L.Callback):
             fwd = pl_module(x[: self.n_samples])
 
         originals = make_grid(
-            x[: self.n_samples], nrow=4, normalize=True, value_range=(0, 1),
+            x[: self.n_samples].float(), nrow=4, normalize=True, value_range=(0, 1),
         )
         recons = make_grid(
-            fwd["x_hat"][: self.n_samples], nrow=4, normalize=True, value_range=(0, 1),
+            fwd["x_hat"][: self.n_samples].float(), nrow=4, normalize=True, value_range=(0, 1),
         )
 
         for logger in trainer.loggers:
