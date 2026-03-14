@@ -1,0 +1,32 @@
+[project]
+name = "generative-models"
+version = "0.1.0"
+description = "Exploring and comparing deep generative models for images"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "torch",
+    "torchvision",
+    "numpy",
+    "matplotlib",
+    "pillow",
+    "tqdm",
+    "tensorboard",
+    "jupyter",
+    "ipywidgets",
+    "torchmetrics[image]",
+    "einops",
+    "safetensors",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "pytest",
+]
+
+[tool.ruff]
+line-length = 99
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
