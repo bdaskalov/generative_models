@@ -19,6 +19,7 @@ def train(
     log_dir: str = "runs",
     sample_every_n_epochs: int = 5,
     n_samples: int = 16,
+    output_dir: str = "outputs",
 ) -> L.Trainer:
     """Train a generative model and return the trainer.
 
@@ -44,6 +45,8 @@ def train(
         How often to log a grid of generated samples.
     n_samples:
         Number of images in the sample grid.
+    output_dir:
+        Directory where sample PNG grids are saved each epoch.
     """
     # Allow tensor cores for float32 matmuls (TF32) — negligible accuracy
     # impact but large speedup on Ampere+ GPUs.
@@ -61,6 +64,7 @@ def train(
         SampleGridCallback(
             every_n_epochs=sample_every_n_epochs,
             n_samples=n_samples,
+            output_dir=output_dir,
         ),
         L.pytorch.callbacks.ModelCheckpoint(
             monitor="val/loss",

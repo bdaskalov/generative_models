@@ -49,6 +49,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Training precision. Mixed modes use tensor cores for matmuls/convs.",
     )
     train_g.add_argument("--log-dir", default="runs")
+    train_g.add_argument("--output-dir", default="outputs", help="Dir for sample PNG grids.")
     train_g.add_argument("--sample-every-n-epochs", type=int, default=5)
     train_g.add_argument("--n-samples", type=int, default=16)
 
@@ -85,6 +86,7 @@ def main(argv: list[str] | None = None) -> None:
         accelerator=args.accelerator,
         precision=args.precision,
         log_dir=args.log_dir,
+        output_dir=args.output_dir,
         sample_every_n_epochs=args.sample_every_n_epochs,
         n_samples=args.n_samples,
     )
