@@ -123,8 +123,11 @@ class VAE(GenerativeModel):
 
     def compute_loss(self, batch: Tensor, fwd: dict[str, Tensor]) -> dict[str, Tensor]:
         x_hat, mu, logvar = fwd["x_hat"], fwd["mu"], fwd["logvar"]
-        recon = F.mse_loss(x_hat, batch, reduction="mean")
-        kl = -0.5 * torch.mean(1 + logvar - mu.pow(2) - logvar.exp())
+        # Sum over pixels per sample, then average over the batch — keeps
+        # reconstruction and KL on the same per-sample scale and avoids
+        # the posterior collapse caused by mean-reduced MSE.
+        recon = F.binary_cross_entropy(x_hat, batch, reduction="sum") / batch.shape[0]
+        kl = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()) / batch.shape[0]
         loss = recon + self.kl_weight * kl
         return {"loss": loss, "recon_loss": recon, "kl_loss": kl}
 
