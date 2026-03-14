@@ -25,11 +25,23 @@ dependencies = [
     "jsonargparse[signatures]",
 ]
 
+[project.scripts]
+generative-models = "generative_models.cli:main"
+
 [project.optional-dependencies]
 dev = [
     "ruff",
     "pytest",
 ]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+torchvision = { index = "pytorch-cu130" }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/generative_models"]
